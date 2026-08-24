@@ -323,3 +323,16 @@ if len(missed_fraud) > 0:
             f"Customer {df.loc[index, 'customer_id']}: "
             f"fraud probability = {probability:.4f}"
         )
+
+# -----------------------------------
+# Save trained model
+# -----------------------------------
+
+import joblib
+
+joblib.dump(
+    model,
+    "model.pkl"
+)
+
+print("\nModel saved to: model.pkl")
