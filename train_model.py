@@ -9,7 +9,7 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 # 1. Load our dataset
 # -----------------------------------
 
-df = pd.read_csv("data/fraud_dataset.csv")
+df = pd.read_csv("data/fraud_dataset_v2.csv")
 
 print("Dataset loaded!")
 print("Total transactions:", len(df))
