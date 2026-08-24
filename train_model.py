@@ -269,6 +269,29 @@ print(
 )
 
 # -----------------------------------
+# Save evaluation summary
+# -----------------------------------
+
+evaluation_summary = pd.DataFrame([
+    {
+        "false_positive_rate": false_positive_rate
+    }
+])
+
+evaluation_summary.to_csv(
+    "data/evaluation_summary.csv",
+    index=False
+)
+
+print(
+    "\nEvaluation summary saved to:"
+)
+
+print(
+    "data/evaluation_summary.csv"
+)
+
+# -----------------------------------
 # 10. Investigate missed fraud
 # -----------------------------------
 
