@@ -154,7 +154,7 @@ print("\nFeature Importance:")
 print(importance)
 
 # -----------------------------------
-# 9. Performance by attack type
+# 9. Detailed Attack Performance
 # -----------------------------------
 
 test_results = df.loc[X_test.index].copy()
@@ -165,29 +165,108 @@ fraud_results = test_results[
     test_results["is_fraud"] == 1
 ]
 
-print("\n===================================")
-print("PERFORMANCE BY ATTACK TYPE")
-print("===================================")
+attack_results = []
 
-for attack in fraud_results["attack_type"].unique():
+for attack in sorted(
+    fraud_results["attack_type"].unique()
+):
 
     attack_data = fraud_results[
         fraud_results["attack_type"] == attack
     ]
 
+    total = len(attack_data)
+
     detected = (
         attack_data["prediction"] == 1
     ).sum()
 
-    total = len(attack_data)
+    missed = total - detected
 
-    recall = detected / total if total > 0 else 0
-
-    print(
-        f"{attack:25s} "
-        f"{detected}/{total} detected "
-        f"({recall * 100:.2f}%)"
+    recall = (
+        detected / total
+        if total > 0
+        else 0
     )
+
+    attack_results.append({
+        "attack_type": attack,
+        "tested": total,
+        "detected": detected,
+        "missed": missed,
+        "recall": recall
+    })
+
+
+attack_report = pd.DataFrame(
+    attack_results
+)
+
+print("\n===================================")
+print("ATTACK PERFORMANCE REPORT")
+print("===================================")
+
+print(
+    attack_report.to_string(
+        index=False,
+        formatters={
+            "recall": "{:.2%}".format
+        }
+    )
+)
+
+# Save attack report
+attack_report.to_csv(
+    "data/attack_performance_report.csv",
+    index=False
+)
+
+print(
+    "\nAttack performance report saved to:"
+)
+
+print(
+    "data/attack_performance_report.csv"
+)
+
+# -----------------------------------
+# 10. False Positive Analysis
+# -----------------------------------
+
+legitimate_results = test_results[
+    test_results["is_fraud"] == 0
+]
+
+false_positives = (
+    legitimate_results["prediction"] == 1
+).sum()
+
+total_legitimate = len(legitimate_results)
+
+false_positive_rate = (
+    false_positives / total_legitimate
+    if total_legitimate > 0
+    else 0
+)
+
+print("\n===================================")
+print("FALSE POSITIVE ANALYSIS")
+print("===================================")
+
+print(
+    "Legitimate transactions tested:",
+    total_legitimate
+)
+
+print(
+    "False positives:",
+    false_positives
+)
+
+print(
+    f"False positive rate: "
+    f"{false_positive_rate:.2%}"
+)
 
 # -----------------------------------
 # 10. Investigate missed fraud

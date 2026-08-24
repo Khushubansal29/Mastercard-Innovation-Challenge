@@ -1,0 +1,7 @@
+attack_type,tested,detected,missed,recall
+account_takeover,20,20,0,1.0
+behaviour_anomaly,21,21,0,1.0
+deepfake_identity,19,19,0,1.0
+social_engineering,20,20,0,1.0
+synthetic_identity,18,18,0,1.0
+velocity_attack,20,20,0,1.0
