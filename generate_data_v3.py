@@ -20,6 +20,13 @@ customer_avg_amount = np.random.uniform(
     N_CUSTOMERS
 )
 
+# Each customer has their own normal transaction frequency
+customer_avg_txn_per_day = np.random.uniform(
+    2,
+    15,
+    N_CUSTOMERS
+)
+
 # Each customer has their own account age
 customer_account_age = np.random.randint(
     30,
@@ -53,6 +60,10 @@ for i in range(N_CUSTOMERS):
             30000
         )
 
+        normal_daily_rate = customer_avg_txn_per_day[i]
+
+        normal_hourly_rate = normal_daily_rate / 24
+
         row = {
             "customer_id": customer_id,
 
@@ -80,11 +91,11 @@ for i in range(N_CUSTOMERS):
             "avg_transaction_amount": avg_amount,
 
             "transactions_last_1h": np.random.poisson(
-                1.5
+                normal_hourly_rate
             ),
 
             "transactions_last_24h": np.random.poisson(
-                8
+                normal_daily_rate
             ),
 
             "account_age_days": account_age,
@@ -354,17 +365,20 @@ velocity_df = normal_df.sample(
     random_state=46
 ).copy()
 
-# Increase transaction frequency
-velocity_df["transactions_last_1h"] = np.random.randint(
-    4,
-    11,
-    N_VELOCITY
+# Make transaction frequency unusually high
+velocity_df["transactions_last_1h"] = np.maximum(
+    velocity_df["transactions_last_1h"] + np.random.randint(
+        3,
+        8,
+        N_VELOCITY
+    ),
+    4
 )
 
-velocity_df["transactions_last_24h"] = np.random.randint(
-    10,
-    35,
-    N_VELOCITY
+velocity_df["transactions_last_24h"] = np.maximum(
+    velocity_df["transactions_last_24h"] +
+    np.random.randint(5, 20, N_VELOCITY),
+    velocity_df["transactions_last_1h"]
 )
 
 # Keep individual payments relatively small
@@ -597,3 +611,4 @@ print(
 
 print("\nV3 dataset saved to:")
 print("data/fraud_dataset_v3.csv")
+
