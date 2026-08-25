@@ -257,6 +257,29 @@ if "transaction" in st.session_state:
 
     st.divider()
 
+    # ===================================
+    # DEFENSE PIPELINE
+    # ===================================
+
+    st.subheader("🔄 Red Team → Blue Team Pipeline")
+
+    pipeline_col1, pipeline_col2, pipeline_col3, pipeline_col4 = st.columns(4)
+
+    with pipeline_col1:
+        st.info("🔴 **Attack Generated**")
+
+    with pipeline_col2:
+        st.info("⚡ **Transaction Simulated**")
+
+    with pipeline_col3:
+        st.info("🔵 **AI Analysis**")
+
+    with pipeline_col4:
+        if result["prediction"] == 1:
+            st.error("🚨 **Threat Detected**")
+        else:
+            st.success("✅ **Transaction Cleared**")
+
     st.header("🔵 Blue Team — Detection")
 
     # Get fraud probability from the model result
