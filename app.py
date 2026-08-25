@@ -23,6 +23,12 @@ st.set_page_config(
     layout="wide"
 )
 
+# ===================================
+# Session history
+# ===================================
+
+if "attack_history" not in st.session_state:
+    st.session_state["attack_history"] = []
 
 # ===================================
 # Custom styling
@@ -142,6 +148,15 @@ if generate_attack:
     st.session_state["result"] = result
     st.session_state["attack_type"] = attack_type
 
+    # Save attack to session history
+
+    st.session_state["attack_history"].append({
+        "attack_type": attack_type,
+        "fraud_probability": result["fraud_probability"],
+        "prediction": result["prediction"],
+        "amount": transaction["amount"]
+    })
+
 
 # ===================================
 # Display transaction
@@ -244,7 +259,13 @@ if "transaction" in st.session_state:
 
     st.header("🔵 Blue Team — Detection")
 
+    # Get fraud probability from the model result
     probability = result["fraud_probability"]
+
+
+    # -----------------------------------
+    # Detection result
+    # -----------------------------------
 
     if result["prediction"] == 1:
 
@@ -260,81 +281,6 @@ if "transaction" in st.session_state:
             f"{1 - probability:.1%} confidence"
         )
 
-    # -----------------------------------
-# Risk bar
-# -----------------------------------
-
-st.progress(
-    probability,
-    text=f"Fraud Risk: {probability:.1%}"
-)
-
-
-# -----------------------------------
-# Risk signals
-# -----------------------------------
-
-st.subheader("🔍 Risk Signals")
-
-signals = []
-
-if transaction["is_new_device"] == 1:
-    signals.append("New device detected")
-
-if transaction["is_new_location"] == 1:
-    signals.append("New location detected")
-
-if transaction["distance_from_home"] > 100:
-    signals.append(
-        f"Unusual distance from home "
-        f"({transaction['distance_from_home']:.1f} km)"
-    )
-
-if transaction["identity_risk_score"] > 0.5:
-    signals.append(
-        f"Elevated identity risk "
-        f"({transaction['identity_risk_score']:.1%})"
-    )
-
-if transaction["behaviour_deviation_score"] > 0.5:
-    signals.append(
-        f"High behaviour deviation "
-        f"({transaction['behaviour_deviation_score']:.1%})"
-    )
-
-if transaction["social_engineering_risk"] > 0.5:
-    signals.append(
-        f"Elevated social-engineering risk "
-        f"({transaction['social_engineering_risk']:.1%})"
-    )
-
-if transaction["transactions_last_1h"] >= 4:
-    signals.append(
-        f"High transaction velocity "
-        f"({int(transaction['transactions_last_1h'])} "
-        f"transactions/hour)"
-    )
-
-if transaction["verification_failed"] == 1:
-    signals.append("Verification failure detected")
-
-if transaction["account_age_days"] < 180:
-    signals.append(
-        f"Relatively new account "
-        f"({int(transaction['account_age_days'])} days)"
-    )
-
-
-if signals:
-
-    for signal in signals:
-        st.warning(f"⚠️ {signal}")
-
-else:
-
-    st.success(
-        "No major risk signals identified."
-    )
 
     # -----------------------------------
     # Risk bar
@@ -344,6 +290,104 @@ else:
         probability,
         text=f"Fraud Risk: {probability:.1%}"
     )
+
+
+    # -----------------------------------
+    # Risk signals
+    # -----------------------------------
+
+    st.subheader("🔍 Risk Signals")
+
+    signals = []
+
+
+    if transaction["is_new_device"] == 1:
+
+        signals.append(
+            "New device detected"
+        )
+
+
+    if transaction["is_new_location"] == 1:
+
+        signals.append(
+            "New location detected"
+        )
+
+
+    if transaction["distance_from_home"] > 100:
+
+        signals.append(
+            f"Unusual distance from home "
+            f"({transaction['distance_from_home']:.1f} km)"
+        )
+
+
+    if transaction["identity_risk_score"] > 0.5:
+
+        signals.append(
+            f"Elevated identity risk "
+            f"({transaction['identity_risk_score']:.1%})"
+        )
+
+
+    if transaction["behaviour_deviation_score"] > 0.5:
+
+        signals.append(
+            f"High behaviour deviation "
+            f"({transaction['behaviour_deviation_score']:.1%})"
+        )
+
+
+    if transaction["social_engineering_risk"] > 0.5:
+
+        signals.append(
+            f"Elevated social-engineering risk "
+            f"({transaction['social_engineering_risk']:.1%})"
+        )
+
+
+    if transaction["transactions_last_1h"] >= 4:
+
+        signals.append(
+            f"High transaction velocity "
+            f"({int(transaction['transactions_last_1h'])} "
+            f"transactions/hour)"
+        )
+
+
+    if transaction["verification_failed"] == 1:
+
+        signals.append(
+            "Verification failure detected"
+        )
+
+
+    if transaction["account_age_days"] < 180:
+
+        signals.append(
+            f"Relatively new account "
+            f"({int(transaction['account_age_days'])} days)"
+        )
+
+
+    # -----------------------------------
+    # Display signals
+    # -----------------------------------
+
+    if signals:
+
+        for signal in signals:
+
+            st.warning(
+                f"⚠️ {signal}"
+            )
+
+    else:
+
+        st.success(
+            "No major risk signals identified."
+        )
 
 # ===================================
 # ATTACK PERFORMANCE
@@ -440,4 +484,48 @@ except FileNotFoundError:
     st.info(
         "Attack performance report "
         "will appear after model evaluation."
+    )
+
+# ===================================
+# LIVE ATTACK HISTORY
+# ===================================
+
+st.divider()
+
+st.header("🔄 Live Attack History")
+
+history = st.session_state["attack_history"]
+
+
+if history:
+
+    history_data = []
+
+    for item in history:
+
+        history_data.append({
+            "Attack": item["attack_type"],
+            "Amount": f"₹{item['amount']:,.2f}",
+            "Risk": f"{item['fraud_probability']:.1%}",
+            "Detection": (
+                "🚨 Fraud Detected"
+                if item["prediction"] == 1
+                else "✅ Legitimate"
+            )
+        })
+
+    history_df = pd.DataFrame(
+        history_data
+    )
+
+    st.dataframe(
+        history_df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+else:
+
+    st.info(
+        "Generate an attack to start the live history."
     )
