@@ -82,20 +82,51 @@ st.divider()
 
 st.header("🔴 Red Team — Attack Simulator")
 
-attack_type = st.selectbox(
-    "Choose an attack type",
+# ===================================
+# Transaction Mode
+# ===================================
+
+transaction_mode = st.radio(
+    "Choose transaction mode",
     [
-        "Account Takeover",
-        "Social Engineering",
-        "Synthetic Identity",
-        "Velocity Attack",
-        "Behaviour Anomaly",
-        "Deepfake Identity"
-    ]
+        "🔴 Attack Simulation",
+        "🟢 Normal Transaction"
+    ],
+    horizontal=True
 )
 
+
+# ===================================
+# Attack Selection
+# ===================================
+
+if transaction_mode == "🔴 Attack Simulation":
+
+    attack_type = st.selectbox(
+        "Choose an attack type",
+        [
+            "Account Takeover",
+            "Social Engineering",
+            "Synthetic Identity",
+            "Velocity Attack",
+            "Behaviour Anomaly",
+            "Deepfake Identity"
+        ]
+    )
+
+else:
+
+    attack_type = "Normal Transaction"
+
+
+# ===================================
+# Generate Transaction
+# ===================================
+
 generate_attack = st.button(
-    "🔴 Generate Attack",
+    "🔴 Generate Attack"
+    if transaction_mode == "🔴 Attack Simulation"
+    else "🟢 Generate Normal Transaction",
     type="primary",
     use_container_width=True
 )
@@ -107,55 +138,86 @@ generate_attack = st.button(
 
 if generate_attack:
 
-    attack_mapping = {
-        "Account Takeover": "account_takeover",
-        "Social Engineering": "social_engineering",
-        "Synthetic Identity": "synthetic_identity",
-        "Velocity Attack": "velocity_attack",
-        "Behaviour Anomaly": "behaviour_anomaly",
-        "Deepfake Identity": "deepfake_identity"
-    }
+        if transaction_mode == "🟢 Normal Transaction":
 
-    selected_attack = attack_mapping[
-        attack_type
-    ]
+            # Load the V3 dataset
+            df = pd.read_csv(
+                "data/fraud_dataset_v3.csv"
+            )
 
-    # Get examples of the selected attack
-    attack_samples = attack_data[
-        attack_data["attack_type"] == selected_attack
-    ]
+            # Keep only genuine transactions
+            legitimate_transactions = df[
+                df["is_fraud"] == 0
+            ]
 
-    # Pick one simulated attack
-    selected_transaction = attack_samples.sample(
-        1
-    ).iloc[0]
+            # Pick one genuine transaction
+            selected_transaction = (
+                legitimate_transactions
+                .sample(1)
+                .iloc[0]
+            )
 
-    # Convert row into dictionary
-    transaction = selected_transaction.to_dict()
+            # Convert to dictionary
+            transaction = selected_transaction.to_dict()
 
-    # Remove dataset-only columns
-    transaction.pop("customer_id", None)
-    transaction.pop("attack_type", None)
-    transaction.pop("is_fraud", None)
+            # Remove dataset-only columns
+            transaction.pop("customer_id", None)
+            transaction.pop("attack_type", None)
+            transaction.pop("is_fraud", None)
 
-    # Send transaction to Blue Team
-    result = detect_transaction(
-        transaction
-    )
+            attack_type = "Normal Transaction"
 
-    # Store results
-    st.session_state["transaction"] = transaction
-    st.session_state["result"] = result
-    st.session_state["attack_type"] = attack_type
+        else:
 
-    # Save attack to session history
+            attack_mapping = {
+                "Account Takeover": "account_takeover",
+                "Social Engineering": "social_engineering",
+                "Synthetic Identity": "synthetic_identity",
+                "Velocity Attack": "velocity_attack",
+                "Behaviour Anomaly": "behaviour_anomaly",
+                "Deepfake Identity": "deepfake_identity"
+            }
 
-    st.session_state["attack_history"].append({
-        "attack_type": attack_type,
-        "fraud_probability": result["fraud_probability"],
-        "prediction": result["prediction"],
-        "amount": transaction["amount"]
-    })
+            selected_attack = attack_mapping[
+                attack_type
+            ]
+
+            # Get examples of the selected attack
+            attack_samples = attack_data[
+                attack_data["attack_type"] == selected_attack
+            ]
+
+            # Pick one simulated attack
+            selected_transaction = attack_samples.sample(
+                1
+            ).iloc[0]
+
+            # Convert row into dictionary
+            transaction = selected_transaction.to_dict()
+
+            # Remove dataset-only columns
+            transaction.pop("customer_id", None)
+            transaction.pop("attack_type", None)
+            transaction.pop("is_fraud", None)
+
+        # Send transaction to Blue Team
+        result = detect_transaction(
+            transaction
+        )
+
+        # Store results
+        st.session_state["transaction"] = transaction
+        st.session_state["result"] = result
+        st.session_state["attack_type"] = attack_type
+
+        # Save attack to session history
+
+        st.session_state["attack_history"].append({
+            "attack_type": attack_type,
+            "fraud_probability": result["fraud_probability"],
+            "prediction": result["prediction"],
+            "amount": transaction["amount"]
+        })
 
 
 # ===================================
@@ -515,7 +577,7 @@ except FileNotFoundError:
 
 st.divider()
 
-st.header("🔄 Live Attack History")
+st.header("🔄 Live Transaction History")
 
 history = st.session_state["attack_history"]
 
@@ -527,7 +589,7 @@ if history:
     for item in history:
 
         history_data.append({
-            "Attack": item["attack_type"],
+            "Transaction Type": item["attack_type"],
             "Amount": f"₹{item['amount']:,.2f}",
             "Risk": f"{item['fraud_probability']:.1%}",
             "Detection": (
