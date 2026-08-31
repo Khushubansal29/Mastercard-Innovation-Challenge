@@ -3,19 +3,13 @@ import pandas as pd
 
 from model import detect_transaction
 
-
-# ===================================
 # Load Red-Team dataset
-# ===================================
 
 attack_data = pd.read_csv(
     "data/fraud_dataset_v3.csv"
 )
 
-
-# ===================================
 # Page configuration
-# ===================================
 
 st.set_page_config(
     page_title="AI Payment Defense Lab",
@@ -23,16 +17,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# ===================================
 # Session history
-# ===================================
 
 if "attack_history" not in st.session_state:
     st.session_state["attack_history"] = []
 
-# ===================================
 # Custom styling
-# ===================================
 
 st.markdown(
     """
@@ -56,10 +46,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-# ===================================
 # Title
-# ===================================
 
 st.markdown(
     '<div class="main-title">🛡️ AI Payment Defense Lab</div>',
@@ -73,18 +60,13 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-# ===================================
 # RED TEAM
-# ===================================
 
 st.divider()
 
 st.header("🔴 Red Team — Attack Simulator")
 
-# ===================================
 # Transaction Mode
-# ===================================
 
 transaction_mode = st.radio(
     "Choose transaction mode",
@@ -95,10 +77,7 @@ transaction_mode = st.radio(
     horizontal=True
 )
 
-
-# ===================================
 # Attack Selection
-# ===================================
 
 if transaction_mode == "🔴 Attack Simulation":
 
@@ -119,9 +98,7 @@ else:
     attack_type = "Normal Transaction"
 
 
-# ===================================
 # Generate Transaction
-# ===================================
 
 generate_attack = st.button(
     "🔴 Generate Attack"
@@ -132,9 +109,7 @@ generate_attack = st.button(
 )
 
 
-# ===================================
 # Generate attack
-# ===================================
 
 if generate_attack:
 
@@ -220,9 +195,7 @@ if generate_attack:
         })
 
 
-# ===================================
 # Display transaction
-# ===================================
 
 if "transaction" in st.session_state:
 
@@ -238,9 +211,7 @@ if "transaction" in st.session_state:
         f"**{st.session_state['attack_type']}**"
     )
 
-    # -----------------------------------
     # Transaction metrics — Row 1
-    # -----------------------------------
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -264,9 +235,7 @@ if "transaction" in st.session_state:
         f"{transaction['distance_from_home']:.1f} km"
     )
 
-    # -----------------------------------
     # Transaction metrics — Row 2
-    # -----------------------------------
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -290,9 +259,7 @@ if "transaction" in st.session_state:
         f"{int(transaction['account_age_days'])} days"
     )
 
-    # -----------------------------------
     # Additional transaction details
-    # -----------------------------------
 
     st.subheader("Transaction Signals")
 
@@ -313,15 +280,12 @@ if "transaction" in st.session_state:
         "YES" if transaction["verification_failed"] == 1 else "NO"
     )
 
-    # ===================================
     # BLUE TEAM
-    # ===================================
 
     st.divider()
 
-    # ===================================
+
     # DEFENSE PIPELINE
-    # ===================================
 
     st.subheader("🔄 Red Team → Blue Team Pipeline")
 
@@ -338,9 +302,9 @@ if "transaction" in st.session_state:
 
     with pipeline_col4:
         if result["prediction"] == 1:
-            st.error("🚨 **Threat Detected**")
+            st.error("**Threat Detected**")
         else:
-            st.success("✅ **Transaction Cleared**")
+            st.success("**Transaction Cleared**")
 
     st.header("🔵 Blue Team — Detection")
 
@@ -348,28 +312,24 @@ if "transaction" in st.session_state:
     probability = result["fraud_probability"]
 
 
-    # -----------------------------------
     # Detection result
-    # -----------------------------------
 
     if result["prediction"] == 1:
 
         st.error(
-            f"🚨 FRAUD DETECTED — "
+            f"FRAUD DETECTED — "
             f"{probability:.1%} risk"
         )
 
     else:
 
         st.success(
-            f"✅ TRANSACTION APPEARS LEGITIMATE — "
+            f"TRANSACTION APPEARS LEGITIMATE — "
             f"{1 - probability:.1%} confidence"
         )
 
 
-    # -----------------------------------
     # Risk bar
-    # -----------------------------------
 
     st.progress(
         probability,
@@ -377,11 +337,9 @@ if "transaction" in st.session_state:
     )
 
 
-    # -----------------------------------
     # Risk signals
-    # -----------------------------------
 
-    st.subheader("🔍 Risk Signals")
+    st.subheader("Risk Signals")
 
     signals = []
 
@@ -456,16 +414,14 @@ if "transaction" in st.session_state:
         )
 
 
-    # -----------------------------------
     # Display signals
-    # -----------------------------------
 
     if signals:
 
         for signal in signals:
 
             st.warning(
-                f"⚠️ {signal}"
+                f"{signal}"
             )
 
     else:
@@ -474,13 +430,12 @@ if "transaction" in st.session_state:
             "No major risk signals identified."
         )
 
-# ===================================
+
 # ATTACK PERFORMANCE
-# ===================================
 
 st.divider()
 
-st.header("📊 Attack Performance")
+st.header("Attack Performance")
 
 try:
 
@@ -488,9 +443,7 @@ try:
         "data/attack_performance_report.csv"
     )
 
-    # -----------------------------------
     # Overall metrics
-    # -----------------------------------
 
     total_tested = attack_report["tested"].sum()
     total_detected = attack_report["detected"].sum()
@@ -571,9 +524,8 @@ except FileNotFoundError:
         "will appear after model evaluation."
     )
 
-# ===================================
+
 # LIVE ATTACK HISTORY
-# ===================================
 
 st.divider()
 
@@ -593,9 +545,9 @@ if history:
             "Amount": f"₹{item['amount']:,.2f}",
             "Risk": f"{item['fraud_probability']:.1%}",
             "Detection": (
-                "🚨 Fraud Detected"
+                "Fraud Detected"
                 if item["prediction"] == 1
-                else "✅ Legitimate"
+                else "Legitimate"
             )
         })
 

@@ -3,9 +3,7 @@ import numpy as np
 
 np.random.seed(42)
 
-# -----------------------------------
 # Basic settings
-# -----------------------------------
 
 N_CUSTOMERS = 1000
 TRANSACTIONS_PER_CUSTOMER = 8
@@ -35,9 +33,7 @@ customer_account_age = np.random.randint(
 )
 
 
-# -----------------------------------
 # Generate normal transactions
-# -----------------------------------
 
 rows = []
 
@@ -143,9 +139,7 @@ print(
 print("\nSample:")
 print(normal_df.head())
 
-# -----------------------------------
 # Attack 1: Account Takeover
-# -----------------------------------
 
 N_ATO = 100
 
@@ -211,9 +205,7 @@ print(
     len(ato_df)
 )
 
-# -----------------------------------
 # Attack 2: AI Social Engineering / APP Fraud
-# -----------------------------------
 
 N_APP = 100
 
@@ -278,9 +270,7 @@ print(
     len(app_df)
 )
 
-# -----------------------------------
 # Attack 3: Synthetic Identity Fraud
-# -----------------------------------
 
 N_SYNTHETIC = 100
 
@@ -353,9 +343,7 @@ print(
     len(synthetic_df)
 )
 
-# -----------------------------------
 # Attack 4: Transaction Velocity / Card Testing
-# -----------------------------------
 
 N_VELOCITY = 100
 
@@ -420,9 +408,7 @@ print(
     len(velocity_df)
 )
 
-# -----------------------------------
 # Attack 5: Behaviour Anomaly
-# -----------------------------------
 
 N_BEHAVIOUR = 100
 
@@ -486,9 +472,7 @@ print(
     len(behaviour_df)
 )
 
-# -----------------------------------
 # Attack 6: Deepfake-Assisted Identity Fraud
-# -----------------------------------
 
 N_DEEPFAKE = 100
 
@@ -559,9 +543,7 @@ print(
     len(deepfake_df)
 )
 
-# -----------------------------------
 # Combine all transactions
-# -----------------------------------
 
 all_data_v3 = pd.concat([
     normal_df,

@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import joblib
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
@@ -9,27 +10,21 @@ from sklearn.metrics import (
 )
 
 
-# -----------------------------------
 # 1. Load our dataset
-# -----------------------------------
 
 df = pd.read_csv("data/fraud_dataset_v3.csv")
 
 print("Dataset loaded!")
 print("Total transactions:", len(df))
 
-# -----------------------------------
 # Derived velocity feature
-# -----------------------------------
 
 df["velocity_ratio"] = (
     df["transactions_last_1h"] /
     (df["transactions_last_24h"] / 24 + 0.1)
 )
 
-# -----------------------------------
 # 2. Select features and target
-# -----------------------------------
 
 features = [
     "amount",
@@ -52,20 +47,17 @@ X = df[features]
 y = df["is_fraud"]
 
 
-# -----------------------------------
 # 3. Split into training and testing
-# -----------------------------------
 
-# -----------------------------------
 # Customer-level train/test split
-# -----------------------------------
 
-# Get unique customers
-unique_customers = df["customer_id"].unique()
-
-# Shuffle customers
-np.random.seed(42)
-np.random.shuffle(unique_customers)
+# Get unique customers and randomly shuffle them
+unique_customers = (
+    df["customer_id"]
+    .drop_duplicates()
+    .sample(frac=1, random_state=42)
+    .to_numpy()
+)
 
 # 80% customers for training
 split_index = int(len(unique_customers) * 0.80)
@@ -95,9 +87,7 @@ print("\nTraining transactions:", len(X_train))
 print("Testing transactions:", len(X_test))
 
 
-# -----------------------------------
 # 4. Create the ML model
-# -----------------------------------
 
 model = RandomForestClassifier(
     n_estimators=100,
@@ -105,9 +95,7 @@ model = RandomForestClassifier(
 )
 
 
-# -----------------------------------
 # 5. Train the model
-# -----------------------------------
 
 print("\nTraining model...")
 
@@ -116,16 +104,12 @@ model.fit(X_train, y_train)
 print("Model training complete!")
 
 
-# -----------------------------------
 # 6. Make predictions
-# -----------------------------------
 
 y_pred = model.predict(X_test)
 
 
-# -----------------------------------
 # 7. Evaluate the model
-# -----------------------------------
 
 accuracy = accuracy_score(y_test, y_pred)
 
@@ -141,9 +125,7 @@ print(classification_report(y_test, y_pred))
 print("\nConfusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
 
-# -----------------------------------
 # 8. Feature importance
-# -----------------------------------
 
 importance = pd.Series(
     model.feature_importances_,
@@ -153,9 +135,7 @@ importance = pd.Series(
 print("\nFeature Importance:")
 print(importance)
 
-# -----------------------------------
 # 9. Detailed Attack Performance
-# -----------------------------------
 
 test_results = df.loc[X_test.index].copy()
 
@@ -229,9 +209,7 @@ print(
     "data/attack_performance_report.csv"
 )
 
-# -----------------------------------
 # 10. False Positive Analysis
-# -----------------------------------
 
 legitimate_results = test_results[
     test_results["is_fraud"] == 0
@@ -268,9 +246,7 @@ print(
     f"{false_positive_rate:.2%}"
 )
 
-# -----------------------------------
 # Save evaluation summary
-# -----------------------------------
 
 evaluation_summary = pd.DataFrame([
     {
@@ -291,9 +267,7 @@ print(
     "data/evaluation_summary.csv"
 )
 
-# -----------------------------------
 # 10. Investigate missed fraud
-# -----------------------------------
 
 missed_fraud = test_results[
     (test_results["is_fraud"] == 1) &
@@ -322,9 +296,7 @@ print(
     ].to_string(index=False)
 )
 
-# -----------------------------------
 # 11. Check prediction confidence
-# -----------------------------------
 
 if len(missed_fraud) > 0:
 
@@ -347,9 +319,7 @@ if len(missed_fraud) > 0:
             f"fraud probability = {probability:.4f}"
         )
 
-# -----------------------------------
 # Save trained model
-# -----------------------------------
 
 import joblib
 

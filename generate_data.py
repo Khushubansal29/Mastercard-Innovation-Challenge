@@ -30,9 +30,7 @@ normal_df = pd.DataFrame(data)
 print("Normal transactions created:", len(normal_df))
 print(normal_df.head())
 
-# -------------------------------
 # Attack 1: Account Takeover
-# -------------------------------
 
 N_ATO = 200
 
@@ -104,9 +102,7 @@ print(
 
 print(ato_df.head())
 
-# -------------------------------
 # Attack 2: AI Social Engineering / APP Fraud
-# -------------------------------
 
 N_APP = 200
 
@@ -177,9 +173,7 @@ print(
 
 print(app_df.head())
 
-# -------------------------------
 # Attack 3: Synthetic Identity Fraud
-# -------------------------------
 
 N_SYNTHETIC = 200
 
@@ -249,9 +243,7 @@ print(
 
 print(synthetic_df.head())
 
-# -------------------------------
 # Attack 4: Transaction Velocity / Card Testing
-# -------------------------------
 
 N_VELOCITY = 200
 
@@ -318,9 +310,7 @@ print(
 
 print(velocity_df.head())
 
-# -------------------------------
 # Attack 5: Behaviour Anomaly
-# -------------------------------
 
 N_BEHAVIOUR = 200
 
@@ -387,9 +377,7 @@ print(
 
 print(behaviour_df.head())
 
-# -------------------------------
 # Attack 6: Deepfake-Assisted Identity Fraud
-# -------------------------------
 
 N_DEEPFAKE = 200
 
@@ -461,9 +449,7 @@ print(
 
 print(deepfake_df.head())
 
-# -------------------------------
 # Combine all transactions
-# -------------------------------
 
 all_data = pd.concat([
     normal_df,

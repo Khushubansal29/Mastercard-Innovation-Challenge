@@ -4,9 +4,7 @@ import numpy as np
 # Make results reproducible
 np.random.seed(42)
 
-# -----------------------------------
 # Create normal transactions
-# -----------------------------------
 
 N = 5000
 
@@ -107,9 +105,7 @@ print("Normal transactions created:", len(normal_df))
 print("\nSample normal transactions:")
 print(normal_df.head())
 
-# -----------------------------------
 # Attack 1: Account Takeover
-# -----------------------------------
 
 N_ATO = 1000
 
@@ -181,9 +177,8 @@ print("\nAccount Takeover transactions created:", len(ato_df))
 print("\nSample ATO transactions:")
 print(ato_df.head())
 
-# -----------------------------------
+
 # Attack 2: AI Social Engineering / APP Fraud
-# -----------------------------------
 
 N_APP = 1000
 
@@ -251,9 +246,8 @@ print(
 print("\nSample Social Engineering transactions:")
 print(app_df.head())
 
-# -----------------------------------
+
 # Attack 3: Synthetic Identity Fraud
-# -----------------------------------
 
 N_SYNTHETIC = 1000
 
@@ -328,9 +322,8 @@ print(
 print("\nSample Synthetic Identity transactions:")
 print(synthetic_df.head())
 
-# -----------------------------------
+
 # Attack 4: Transaction Velocity / Card Testing
-# -----------------------------------
 
 N_VELOCITY = 1000
 
@@ -394,9 +387,8 @@ print(
 print("\nSample Velocity transactions:")
 print(velocity_df.head())
 
-# -----------------------------------
+
 # Attack 5: Behaviour Anomaly
-# -----------------------------------
 
 N_BEHAVIOUR = 1000
 
@@ -461,9 +453,7 @@ print(
 print("\nSample Behaviour Anomaly transactions:")
 print(behaviour_df.head())
 
-# -----------------------------------
 # Attack 6: Deepfake-Assisted Identity Fraud
-# -----------------------------------
 
 N_DEEPFAKE = 1000
 
@@ -537,9 +527,7 @@ print(
 print("\nSample Deepfake Identity transactions:")
 print(deepfake_df.head())
 
-# -----------------------------------
 # Combine all transactions
-# -----------------------------------
 
 all_data_v2 = pd.concat([
     normal_df,
